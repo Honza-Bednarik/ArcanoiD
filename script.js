@@ -1,27 +1,35 @@
 function setup() {
 	createCanvas(500, 500);
 }
-//je to ošklivé ale asi to nevadí
-var [xPalka, yPalka] = [225, 420]; //počáteční pozice pálky
-var [xBalonek, yBalonek] = [250, 300]; //počáteční pozice balonku
-var sirkaPalky = 80; //šířka pálky
-var hrajem = false; // kontrola zda je hra v běhu 
-var rychlostPalky = 20; //rychlost pákly
-var rychlostBalonku = 2; //rychlost balonku
-var xRychlostBalonku = 0; //rychlost balonku v ose X
-var yRychlostBalonku = rychlostBalonku; //rychlost balonku v ose Y
-var velikostBalonku = 10; //velikost balonku
-var pocetZivotu = 3; //počet životů/balonků
-var score = -1; //počet sestřelených kostek
+// deklarace proměnných, konkrétní hodnoty se definují ve funkci reset
+var xPalka; //počáteční pozice pálky X
+var yPalka; //počáteční pozice pálky Y
+var xBalonek; //počáteční pozice balonku X
+var yBalonek; //počáteční pozice balonku Y
+var sirkaPalky; //šířka pálky
+var rychlostPalky; //rychlost pákly
+var rychlostBalonku; //rychlost balonku
+var xRychlostBalonku; //rychlost balonku v ose X
+var yRychlostBalonku; //rychlost balonku v ose Y
+var velikostBalonku; //velikost balonku
+var pocetZivotu; //počet životů/balonků
+
+// proměnné které z nějakých důvodů musí být definováný mimo funkci reset
+var hrajem = false; // kontrola zda je hra v běhu
 var mys = true; //stav ovládání
 
+//tím že je score při prvotním spuštění nastaveno na -1 zamezím tomu aby se score vypsalo
+var score = -1; //počet sestřelených kostek
+
+//úplný nebo častečný reset podle stavu hry
 function reset(){
-  //úplný nebo častečný reset podle stavu hry
+  //pouští se před začátkem každé hry a resetuje proměnné na základní hodnoty
   if (hrajem == false){
-    [xPalka, yPalka] = [225, 420]; //počáteční pozice pálky
-    [xBalonek, yBalonek] = [250, 300]; //počáteční pozice balonku
+    xPalka = 225; //počáteční pozice pálky X
+    yPalka = 420; //počáteční pozice pálky Y
+    xBalonek = 250; //počáteční pozice balonku X
+    yBalonek = 300; //počáteční pozice balonku Y
     sirkaPalky = 80; //šířka pálky
-    hrajem = false; // kontrola zda je hra v běhu 
     rychlostPalky = 6; //rychlost pákly
     rychlostBalonku = 3; //rychlost balonku
     xRychlostBalonku = 0; //rychlost balonku v ose X
@@ -30,8 +38,10 @@ function reset(){
     pocetZivotu = 3; //počet životů/balonků
     score = 0; //počet sestřelených kostek
   }
+  //slouží k resetování rychlosti a pozice balonku (respawn)
   if (hrajem == true){
-    [xBalonek, yBalonek] = [250, 300]; //počáteční pozice balonku
+    xBalonek = 250; //počáteční pozice balonku X
+    yBalonek = 300; //počáteční pozice balonku Y
     rychlostBalonku = 2; //rychlost balonku
     xRychlostBalonku = 0; //rychlost balonku v ose X
     yRychlostBalonku = rychlostBalonku; //rychlost balonku v ose Y
@@ -117,20 +127,23 @@ function balonek(){
   //SMRT
   if (yBalonek>height-velikostBalonku){
     pocetZivotu -= 1;
-    reset();
+    reset(); //tady be se asi hodilo udělat nějaké zpoždění mezi smrtí a respawnem
     if (pocetZivotu < 0){hrajem = false}
   }
   //odražení od pálky
-  if (yBalonek>(yPalka-velikostBalonku) && yBalonek<(yPalka)){
-    if ((xBalonek+velikostBalonku)>xPalka && xBalonek<(xPalka+sirkaPalky)){
-      //odraz Y
-      yRychlostBalonku= yRychlostBalonku*-1
-      //odraz X a získání úhlu v závislostu na tom kterou část pálky trefí
-      let uhel = (xPalka+(sirkaPalky/2))-(xBalonek+(velikostBalonku/2))
-      xRychlostBalonku = uhel/(sirkaPalky/2);
-    }
+  //pokud balonek klesá a je těsně nad pálkou pak... 
+  if (yRychlostBalonku > 0 && 
+      yBalonek>(yPalka-velikostBalonku) && 
+      yBalonek<yPalka && 
+      (xBalonek+velikostBalonku)>xPalka && xBalonek<(xPalka+sirkaPalky)){
+    //odraz Y 
+    yRychlostBalonku= yRychlostBalonku*-1
+    //odraz X a získání úhlu v závislostu na tom kterou část pálky trefí
+    let uhel = (xPalka+(sirkaPalky/2))-(xBalonek+(velikostBalonku/2))
+    xRychlostBalonku = uhel/(sirkaPalky/2);
   }
 }
+// vypisování score a životů
 function info(){
   stroke(255, 0, 255);
   strokeWeight(2);
@@ -140,6 +153,7 @@ function info(){
   stroke(0, 0, 255);
   text('Sestřeleno kostek: '+score, 10, 490);
 }
+//ovládání pohybu pálky
 function ovladani(){
   xRychlostPalky = 0
   if (mys){

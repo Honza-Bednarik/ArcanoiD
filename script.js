@@ -1,7 +1,7 @@
 function setup() {
 	createCanvas(500, 500);
 }
-
+//je to ošklivé ale asi to nevadí
 var [xPalka, yPalka] = [225, 420]; //počáteční pozice pálky
 var [xBalonek, yBalonek] = [250, 300]; //počáteční pozice balonku
 var sirkaPalky = 80; //šířka pálky
@@ -16,6 +16,7 @@ var score = -1; //počet sestřelených kostek
 var mys = true; //stav ovládání
 
 function reset(){
+  //úplný nebo častečný reset podle stavu hry
   if (hrajem == false){
     [xPalka, yPalka] = [225, 420]; //počáteční pozice pálky
     [xBalonek, yBalonek] = [250, 300]; //počáteční pozice balonku
@@ -40,7 +41,8 @@ function reset(){
 
 
 function draw() {
-	if (hrajem) {
+	//vykreslování podle stavu hry
+  if (hrajem) {
     scenaHry();
 	  ovladani();
     palka();
@@ -49,13 +51,14 @@ function draw() {
   } else {
     scenaMenu()
   }
-    if (mys){
-      stroke(255,);
-      strokeWeight(2);
-      fill(0);
-      textSize(42);
-      text('M', 440, 480);
-    }
+  //indikátor ovládání myší
+  if (mys){
+    stroke(255,);
+    strokeWeight(2);
+    fill(0);
+    textSize(42);
+    text('M', 440, 480);
+  }
 }
 // vykreslování scény
 function scenaHry() {

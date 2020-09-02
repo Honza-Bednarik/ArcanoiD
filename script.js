@@ -51,10 +51,10 @@ function reset(){
   if (hrajem == true){
     xBalonek = 250; //počáteční pozice balonku X
     yBalonek = 300; //počáteční pozice balonku Y
-    rychlostBalonku = 2; //rychlost balonku
+    //rychlostBalonku = 2; //rychlost balonku se nemění
     xRychlostBalonku = 0; //rychlost balonku v ose X
     yRychlostBalonku = rychlostBalonku; //rychlost balonku v ose Y
-    velikostBalonku = 15; //velikost balonku
+    //velikostBalonku = 15; //velikost balonku se nemění
   }
 }
 
@@ -221,11 +221,11 @@ function generujCihly(){
     }
   }
 }
-//vykresľovanie tehiel
+//takhle blbě to je rozepsaný jen proto že mě to přišlo přehlednější
 function vykreslyCihly(){
   cihly.forEach(vykreslyCihlu);
 }
-
+//vykresľovanie tehiel
 function vykreslyCihlu(item){
   strokeWeight(globalStroke);
   if (item.zije){
@@ -234,11 +234,11 @@ function vykreslyCihlu(item){
     rect (item.x, item.y, cihlaVelikostX, cihlaVelikostY);
   }
 }
-
+//viz víše
 function kolizeCihel(){
   cihly.forEach(kolizeCihly);
 }
-
+//kontrola kolize pravého rohu míčku s hitboxem cihly, rozšířeným o velikost balónku a strokeWeight
 function kolizeCihly(item){
   if (
     item.zije &&
@@ -252,8 +252,9 @@ function kolizeCihly(item){
       score += 1;
       //kontrola výhry
       if (score == delkaRadku*pocetRadku){hrajem = false;}
-      //odrážení balonku od cihly
-      //xRychlostBalonku = xRychlostBalonku*-1;
+      //odrážení balonku od cihly 
+      //xRychlostBalonku = xRychlostBalonku*-1; 
+      //odrážení v obou osách mi příjde hloupé a dělat to podle směru odkud balonek přiletí je zase moc práce
       yRychlostBalonku = yRychlostBalonku*-1;
   }
 }

@@ -7,14 +7,22 @@ var yPalka; //počáteční pozice pálky Y
 var xBalonek; //počáteční pozice balonku X
 var yBalonek; //počáteční pozice balonku Y
 var sirkaPalky; //šířka pálky
-var rychlostPalky; //rychlost pákly
+var rychlostPalky; //rychlost pálky
 var rychlostBalonku; //rychlost balonku
 var xRychlostBalonku; //rychlost balonku v ose X
 var yRychlostBalonku; //rychlost balonku v ose Y
 var velikostBalonku; //velikost balonku
 var pocetZivotu; //počet životů/balonků
 
-// proměnné které z nějakých důvodů musí být definováný mimo funkci reset
+
+
+// proměnné které z nějakých důvodů dává smysl definovat mimo funkci reset - =spôsobené potrebou definovať začiatočnú hodnotu
+var delkaRadku = 6;
+var pocetRadku = 3;
+var cihly = new Array(delkaRadku*pocetRadku);
+var cihlaVelikostX = 44;
+var cihlaVelikostY = 22;
+var globalStroke = 4;
 var hrajem = false; // kontrola zda je hra v běhu
 var mys = true; //stav ovládání
 
@@ -29,14 +37,15 @@ function reset(){
     yPalka = 420; //počáteční pozice pálky Y
     xBalonek = 250; //počáteční pozice balonku X
     yBalonek = 300; //počáteční pozice balonku Y
-    sirkaPalky = 80; //šířka pálky
+    sirkaPalky = 100; //šířka pálky
     rychlostPalky = 6; //rychlost pákly
-    rychlostBalonku = 3; //rychlost balonku
+    rychlostBalonku = 2; //rychlost balonku
     xRychlostBalonku = 0; //rychlost balonku v ose X
     yRychlostBalonku = rychlostBalonku; //rychlost balonku v ose Y
-    velikostBalonku = 10; //velikost balonku
+    velikostBalonku = 15; //velikost balonku
     pocetZivotu = 3; //počet životů/balonků
     score = 0; //počet sestřelených kostek
+    generujCihly(); //generování pole cihel
   }
   //slouží k resetování rychlosti a pozice balonku (respawn)
   if (hrajem == true){
@@ -45,7 +54,7 @@ function reset(){
     rychlostBalonku = 2; //rychlost balonku
     xRychlostBalonku = 0; //rychlost balonku v ose X
     yRychlostBalonku = rychlostBalonku; //rychlost balonku v ose Y
-    velikostBalonku = 10; //velikost balonku
+    velikostBalonku = 15; //velikost balonku
   }
 }
 
@@ -55,8 +64,10 @@ function draw() {
   if (hrajem) {
     scenaHry();
 	  ovladani();
+    vykreslyCihly();
     palka();
     balonek();
+    kolizeCihel();
     info();
   } else {
     scenaMenu()
@@ -100,23 +111,28 @@ function scenaMenu() {
     text('Sestřeleno kostek: '+score, 20, 230);
   }
 }
-// vykreslování pákly
+// vykreslování pálky
 function palka() {
   stroke(255);
   strokeWeight(4);
   fill(0, 255, 0);
-  rect(xPalka, yPalka, sirkaPalky, 15);
-  //omezení pohybu pálky v ose X před vykreslením
-  if (xPalka<0) {xPalka = 0}
-  if (xPalka>width-sirkaPalky) {xPalka = width-sirkaPalky}
+  rect(xPalka, yPalka, sirkaPalky, 16);
   xPalka += xRychlostPalky;
+  //omezení pohybu pálky v ose X před vykreslením
+  if (xPalka<0) {
+    xPalka = 0;
+  }
+  if (xPalka>width-sirkaPalky) {
+    xPalka = width-sirkaPalky;
+  }
 }
 //vykreslování a pohyb balonku
 function balonek(){
   stroke(255, 0, 0);
-  strokeWeight(4);
+  strokeWeight(globalStroke);
   fill(255);
   rect(xBalonek, yBalonek, velikostBalonku, velikostBalonku); //rozhodl jsem se že balónek bude čtverec
+
   //pohyb balonku
   xBalonek += xRychlostBalonku;
   yBalonek += yRychlostBalonku;
@@ -124,11 +140,13 @@ function balonek(){
   if (xBalonek<0){xRychlostBalonku = xRychlostBalonku*-1}
   if (xBalonek>width-velikostBalonku){xRychlostBalonku = xRychlostBalonku*-1}
   if (yBalonek<0){yRychlostBalonku = yRychlostBalonku*-1}
+
   //SMRT
   if (yBalonek>height-velikostBalonku){
     pocetZivotu -= 1;
-    reset(); //tady be se asi hodilo udělat nějaké zpoždění mezi smrtí a respawnem
+    reset();//tady be se asi hodilo udělat nějaké zpoždění mezi smrtí a respawnem
     if (pocetZivotu < 0){hrajem = false}
+    
   }
   //odražení od pálky
   //pokud balonek klesá a je těsně nad pálkou pak... 
@@ -155,7 +173,7 @@ function info(){
 }
 //ovládání pohybu pálky
 function ovladani(){
-  xRychlostPalky = 0
+  xRychlostPalky = 0;
   if (mys){
     xPalka=mouseX;
   }
@@ -188,4 +206,54 @@ function keyPressed() {
       }
 		break;
 	}
+}
+//zadanie parametrov tehiel
+function generujCihly(){
+  for (let i=0;i<cihly.length;i++){
+    let barvaStroke = color(random(255), random(255), random(255));
+    let barvaFill = color(random(255), random(255), random(255));
+    cihly[i] = {
+      cihlaStroke: barvaStroke, 
+      cihlaFill: barvaFill, 
+      y: 40+(40*Math.floor(i/delkaRadku)), //změna řádku po N kostkách
+      x: 15+((cihlaVelikostX*(i+1)+((cihlaVelikostX/2)*(i)))-((cihlaVelikostX*delkaRadku)+((cihlaVelikostX/2)*delkaRadku))*Math.floor(i/delkaRadku)),
+      zije: true
+    }
+  }
+}
+//vykresľovanie tehiel
+function vykreslyCihly(){
+  cihly.forEach(vykreslyCihlu);
+}
+
+function vykreslyCihlu(item){
+  strokeWeight(globalStroke);
+  if (item.zije){
+    stroke(item.cihlaStroke);
+    fill(item.cihlaFill);
+    rect (item.x, item.y, cihlaVelikostX, cihlaVelikostY);
+  }
+}
+
+function kolizeCihel(){
+  cihly.forEach(kolizeCihly);
+}
+
+function kolizeCihly(item){
+  if (
+    item.zije &&
+    item.x - (velikostBalonku+globalStroke) < xBalonek && 
+    item.x + (cihlaVelikostX+globalStroke) > xBalonek &&
+    item.y + (velikostBalonku+globalStroke) > yBalonek && 
+    item.y - (cihlaVelikostY+globalStroke) < xBalonek
+    )
+    {
+      item.zije = false;
+      score += 1;
+      //kontrola výhry
+      if (score == delkaRadku*pocetRadku){hrajem = false;}
+      //odrážení balonku od cihly
+      //xRychlostBalonku = xRychlostBalonku*-1;
+      yRychlostBalonku = yRychlostBalonku*-1;
+  }
 }
